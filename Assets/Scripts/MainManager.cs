@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,7 +12,10 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text highScoreAndName;
+    public TextMeshProUGUI currentPlayerName;
     public GameObject GameOverText;
+    public GameObject newHighScore;
     
     private bool m_Started = false;
     private int m_Points;
@@ -22,6 +26,21 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //string playername = PersistantData.Instance.userName;
+
+        if (string.IsNullOrWhiteSpace(PersistantData.Instance.userName))
+        {
+            currentPlayerName.SetText("Umm. you were supposed to enter a name Dopey");
+        }
+        else
+        {
+            
+            currentPlayerName.SetText(PersistantData.Instance.userName);
+        }
+
+        highScoreAndName.text = "The Score to beat is:" + PersistantData.Instance.highScore + " Made by: " + PersistantData.Instance.highUserName;
+
+         
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -66,11 +85,26 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+        //currentPlayerName.text = PersistantData.Instance.userName;
+        
+
+
+        
     }
 
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        if (m_Points > PersistantData.Instance.highScore)
+        {
+        PersistantData.Instance.SaveHighScore(m_Points);
+            newHighScore.SetActive(true);
+            highScoreAndName.text = "The Score to beat is:" + m_Points + " Made by: " + PersistantData.Instance.userName;
+        }
+
+        
+
     }
 }
